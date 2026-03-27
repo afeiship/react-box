@@ -1,39 +1,20 @@
 {
-  "name":"react-umi-app",
+  "name": "@jswork/react-box",
   "version": "1.0.0",
+  "description": "Type-safe polymorphic React box component with flexible rendering and smart defaults.",
+  "homepage": "https://js.work",
+  "type": "module",
   "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
-    "dev": "umi dev",
-    "build": "umi build",
-    "prettier": "prettier --write '**/*.{js,jsx,tsx,ts,less,md,json}'",
-    "test": "umi-test",
-    "test:coverage": "umi-test --coverage"
-  },
-  "gitHooks": {
-    "pre-commit": "lint-staged"
-  },
-  "lint-staged": {
-    "*.{js,jsx,less,md,json}": [
-      "prettier --write"
-    ],
-    "*.ts?(x)": [
-      "prettier --parser=typescript --write"
-    ]
-  },
-  "dependencies": {
-    "@feizheng/next-list2map": "^1.0.2",
-    "@feizheng/next-react-umi": "^1.0.0",
-    "@umijs/plugin-sass": "^1.1.1",
-    "@umijs/preset-react": "1.x",
-    "@umijs/test": "^3.0.12",
-    "axios": "^0.19.2",
-    "lint-staged": "^10.0.7",
-    "node-sass": "^4.13.1",
-    "prettier": "^1.19.1",
-    "react": "^16.12.0",
-    "react-dom": "^16.12.0",
-    "sass-loader": "^8.0.2",
-    "umi": "^3.0.12",
-    "yorkie": "^2.0.0"
+    "dev": "cd packages/example && yarn run dev",
+    "predocs": "rm -rf docs && node scripts/markdown.js",
+    "docs": "cd packages/example && yarn run build",
+    "postdocs": "cp -R packages/example/dist docs",
+    "preln:build": "yarn run docs",
+    "ln:build": "cd packages/lib && yarn run build",
+    "ln:publish": "cd packages/lib && yarn run release"
   }
 }
