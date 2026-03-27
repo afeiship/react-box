@@ -1,7 +1,9 @@
 import { ReactBox } from '@jswork/react-box/src/main';
 import { Card } from './components/Card';
+import { Fragment } from 'react';
 
 const View = ReactBox.withProps({ as: Card });
+const FragmentView = ReactBox.withProps({ as: Fragment });
 
 function App() {
   return (
@@ -13,6 +15,9 @@ function App() {
       <ReactBox as="img" src="https://pic.rmb.bdstatic.com/7f7a8d7b247d3aa430010f10a5765239.jpeg" alt="As image" />
       <Card description="header">Just a View</Card>
       <View footer="foooter" title="abc" description="desc">View with card</View>
+      <p>
+        <FragmentView>Frag</FragmentView>
+      </p>
     </div>
   );
 }
