@@ -14,7 +14,7 @@ function App() {
       <ReactBox as="a" target="_blank" href="https://js.work">JSW as anchor</ReactBox>
       <ReactBox as="img" src="https://pic.rmb.bdstatic.com/7f7a8d7b247d3aa430010f10a5765239.jpeg" alt="As image" />
       <Card description="header">Just a View</Card>
-      <View footer="foooter" title="abc" description="desc">View with card</View>
+      <View footer="foooter" title="abc" description="abc">View with card</View>
       <p>
         <FragmentView>Frag</FragmentView>
       </p>
