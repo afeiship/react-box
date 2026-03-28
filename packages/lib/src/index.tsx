@@ -1,39 +1,37 @@
-import React, { ElementType, forwardRef } from 'react';
-import withProps, { Props, WithPropsReturnType } from '@jswork/with-props';
+import React from 'react';
+import withProps from '@jswork/with-props';
+
+/** Base ReactBox implementation */
+function ReactBoxImpl<
+  C extends keyof JSX.IntrinsicElements | React.ComponentType<any> = 'div'
+>(props: Omit<React.ComponentProps<C>, 'as'> & { as?: C; children?: React.ReactNode; ref?: React.Ref<any> }): React.ReactElement {
+  const { as: Component = 'div', ref, children, ...rest } = props;
+  return React.createElement(Component as any, { ref, ...rest }, children);
+}
 
 /**
- * A polymorphic box component with static `withProps` method.
- * @template C - The element type to render (defaults to 'div')
+ * Helper function to create a ReactBox variant with proper type inference.
+ * Returns a component with the exact same props as the input component.
  */
-type ReactBoxComponent = (<C extends ElementType = 'div'>(
-  props: Props<C> & { ref?: React.Ref<React.ComponentRef<C>> },
-) => React.ReactElement) & {
+export function createReactBoxVariant<T extends Record<string, any>>(
+  component: React.ComponentType<T>
+): React.FC<Omit<T, 'as'>> {
+  return function(props: Omit<T, 'as'>) {
+    return React.createElement(component, props as any);
+  } as any;
+}
+
+/** ReactBox component type with methods */
+type ReactBoxType = typeof ReactBoxImpl & {
   displayName?: string;
-  /** Creates a new component with merged default props */
-  withProps<D extends Record<string, unknown>>(this: ReactBoxComponent, defaultProps: D): WithPropsReturnType<D>;
+  withProps<D extends Record<string, unknown>>(defaultProps: D): any;
+  createVariant<T extends Record<string, any>>(component: React.ComponentType<T>): any;
 };
 
-/** Internal forwarded component implementation */
-const ReactBoxForwarded = forwardRef<HTMLDivElement, Omit<Props<'div'>, 'ref'>>(function ReactBox(
-  { as, children, ...rest }: Omit<Props<'div'>, 'ref'>,
-  ref,
-) {
-  const Component = as || 'div';
-
-  return (
-    <Component ref={ref} {...rest}>
-      {children}
-    </Component>
-  );
-});
-
-/** Polymorphic box component that renders any HTML element */
-export const ReactBox = Object.assign(ReactBoxForwarded as unknown as ReactBoxComponent, {
-  /** Creates a new component with merged default props */
-  withProps<D extends Record<string, unknown>>(this, defaultProps: D): WithPropsReturnType<D> {
-    return withProps(this, defaultProps);
-  },
-});
-
-/** Props type for ReactBox component */
-export type ReactBoxProps<C extends ElementType> = Props<C>;
+/** ReactBox polymorphic component */
+export const ReactBox = ReactBoxImpl as ReactBoxType;
+ReactBox.displayName = 'ReactBox';
+ReactBox.withProps = function<D extends Record<string, unknown>>(defaultProps: D) {
+  return withProps(ReactBox as any, defaultProps);
+};
+ReactBox.createVariant = createReactBoxVariant;

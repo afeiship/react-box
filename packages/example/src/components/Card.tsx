@@ -9,7 +9,6 @@ export interface CardProps {
 }
 
 export const Card = ({ title, children, className = '', footer, description }: CardProps) => {
-  console.log('Card props:', { title, children, className, footer });
   return (
     <div className={`card bg-base-100 shadow-xl ${className}`}>
       <header>{description}</header>

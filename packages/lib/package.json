@@ -37,6 +37,6 @@
     "registry": "https://registry.npmjs.org"
   },
   "dependencies": {
-    "@jswork/with-props": "^1.1.10"
+    "@jswork/with-props": "^1.1.14"
   }
 }

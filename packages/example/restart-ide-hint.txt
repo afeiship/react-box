@@ -1,0 +1,12 @@
+请在 IDE 中执行以下操作来清除类型缓存：
+
+1. 关闭所有 TypeScript/TypeScript React 文件
+2. 在 VS Code 中按 Cmd+Shift+P (Mac) 或 Ctrl+Shift+P (Windows/Linux)
+3. 输入 "TypeScript: Restart TS Server"
+4. 选择并执行
+
+或者：
+1. 完全关闭 IDE/VS Code
+2. 重新打开项目
+
+这应该能清除类型缓存，让新的类型定义生效。
