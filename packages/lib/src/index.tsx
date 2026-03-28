@@ -9,18 +9,6 @@ function ReactBoxImpl<
   return React.createElement(Component as any, { ref, ...rest }, children);
 }
 
-/**
- * Helper function to create a ReactBox variant with proper type inference.
- * Returns a component with the exact same props as the input component.
- */
-export function createReactBoxVariant<T extends Record<string, any>>(
-  component: React.ComponentType<T>
-): React.FC<Omit<T, 'as'>> {
-  return function(props: Omit<T, 'as'>) {
-    return React.createElement(component, props as any);
-  } as any;
-}
-
 /** ReactBox component type with methods */
 type ReactBoxType = typeof ReactBoxImpl & {
   displayName?: string;
@@ -34,4 +22,3 @@ ReactBox.displayName = 'ReactBox';
 ReactBox.withProps = function<D extends Record<string, unknown>>(defaultProps: D) {
   return withProps(ReactBox as any, defaultProps);
 };
-ReactBox.createVariant = createReactBoxVariant;
