@@ -1,24 +1,40 @@
-import React from 'react';
-import withProps from '@jswork/with-props';
+import React, { ElementType, forwardRef } from 'react';
 
-/** Base ReactBox implementation */
-function ReactBoxImpl<
-  C extends keyof JSX.IntrinsicElements | React.ComponentType<any> = 'div'
->(props: Omit<React.ComponentProps<C>, 'as'> & { as?: C; children?: React.ReactNode; ref?: React.Ref<any> }): React.ReactElement {
-  const { as: Component = 'div', ref, children, ...rest } = props;
-  return React.createElement(Component as any, { ref, ...rest }, children);
+/**
+ * Base props for polymorphic components.
+ * @template C - The element type to render as
+ */
+export interface PolymorphicProps<C extends ElementType> {
+  as?: C;
+  children?: React.ReactNode;
 }
 
-/** ReactBox component type with methods */
-type ReactBoxType = typeof ReactBoxImpl & {
-  displayName?: string;
-  withProps<D extends Record<string, unknown>>(defaultProps: D): any;
-  createVariant<T extends Record<string, any>>(component: React.ComponentType<T>): any;
-};
+/**
+ * Computed props type merging custom props with element props.
+ * @template C - The element type
+ */
+export type Props<C extends ElementType> = PolymorphicProps<C> &
+  Omit<React.ComponentProps<C>, keyof PolymorphicProps<C>>;
 
-/** ReactBox polymorphic component */
-export const ReactBox = ReactBoxImpl as ReactBoxType;
-ReactBox.displayName = 'ReactBox';
-ReactBox.withProps = function<D extends Record<string, unknown>>(defaultProps: D) {
-  return withProps(ReactBox as any, defaultProps);
-};
+/**
+ * Type definition for the ReactBox component.
+ * @template C - The element type, defaults to 'div'
+ */
+type ReactBoxComponent = <C extends ElementType = 'div'>(
+  props: Props<C> & { ref?: React.Ref<React.ElementRef<C>> },
+) => React.JSX.Element;
+
+/**
+ * A polymorphic box component that can render as any HTML element or React component.
+ * @template C - The element type, defaults to 'div'
+ */
+export const ReactBox = forwardRef<any, 'div'>(function ReactBox(
+  { as: AsComponent = 'div', children, ...rest }: any,
+  ref: any,
+) {
+  return (
+    <AsComponent ref={ref} {...rest}>
+      {children}
+    </AsComponent>
+  );
+}) as ReactBoxComponent;
