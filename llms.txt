@@ -1,18 +1,14 @@
 # ReactBox
-> ReactBox is a type-safe polymorphic React box component library with flexible rendering and smart defaults. It provides a powerful foundation for building reusable UI components with TypeScript support, automatic prop forwarding, and component composition patterns.
-
-All components are written in TypeScript and designed for modern React applications. The library focuses on providing a simple yet powerful primitive for building UI components with full type safety and excellent developer experience.
+> ReactBox is a type-safe polymorphic React box component with flexible rendering and smart defaults. It provides a powerful foundation for building reusable UI components with TypeScript support, automatic prop forwarding, and component composition patterns.
 
 **Important notes for agents:**
-- ReactBox is a lightweight component library focused on the primitive box component pattern
-- All components are fully typed with TypeScript and support polymorphic `as` prop
-- The `withProps` static method allows creating pre-configured component variants
+- ReactBox is a lightweight polymorphic component that can render as any HTML element
+- Fully typed with TypeScript and supports the `as` prop for polymorphic rendering
 - Zero runtime overhead - just a thin wrapper around React's forwardRef
 - Works seamlessly with Tailwind CSS, CSS Modules, and any styling solution
-- Peer dependencies: React, React DOM, and classnames
+- No external dependencies beyond React and React DOM
 
 ## Documentation
-- [Homepage](https://js.work): Project homepage with documentation
 - [GitHub Repository](https://github.com/afeiship/react-box): Source code and issues
 - [NPM Package](https://www.npmjs.org/package/@jswork/react-box): Package information and versions
 - [Preview/Demo](https://afeiship.github.io/react-box/): Live preview and examples
@@ -20,7 +16,6 @@ All components are written in TypeScript and designed for modern React applicati
 ## Key Features
 - **Type-Safe Polymorphic Component**: Render any HTML element with full TypeScript support
 - **Smart Prop Forwarding**: Automatically forwards props to the underlying element
-- **Static withProps Method**: Create pre-configured component variants with default props
 - **ForwardRef Support**: Full ref forwarding for DOM access and integration
 - **Zero Runtime Cost**: Minimal abstraction layer with no performance penalty
 - **Framework Agnostic**: Works with Next.js, Remix, Vite, and any React setup
@@ -78,46 +73,18 @@ import { ReactBox } from '@jswork/react-box';
 <ReactBox as="section" className="hero-section">
   Hero Content
 </ReactBox>
-```
 
-### Using withProps for Component Variants
-Create pre-configured components with default props:
-
-```tsx
-import { ReactBox } from '@jswork/react-box';
-
-// Create a Card component with default styles
-const Card = ReactBox.withProps({
-  className: 'p-6 bg-white rounded-lg shadow-md',
-  as: 'article'
-});
-
-// Create a Button component
-const Button = ReactBox.withProps({
-  className: 'px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600',
-  as: 'button',
-  type: 'button'
-});
-
-// Use your custom components
-function App() {
-  return (
-    <>
-      Card>
-        <h2>Card Title</h2>
-        <p>Card content goes here...</p>
-      </Card>
-      <Button>Click me</Button>
-    </>
-  );
-}
+// Render as a heading
+<ReactBox as="h1" className="text-3xl font-bold">
+  Title
+</ReactBox>
 ```
 
 ### Type-Safe Component Composition
 ```tsx
-import { ReactBox, type ReactBoxProps } from '@jswork/react-box';
+import { ReactBox, type Props } from '@jswork/react-box';
 
-type FlexProps = ReactBoxProps<'div'> & {
+type FlexProps = Props<'div'> & {
   direction?: 'row' | 'column';
   align?: 'start' | 'center' | 'end';
   justify?: 'start' | 'center' | 'end' | 'between';
@@ -170,50 +137,41 @@ function StyledComponents() {
 ### ReactBox
 The main polymorphic box component.
 
-#### Props
-- `as?: ElementType` - The HTML element or React component to render (default: `'div'`)
-- `className?: string` - CSS class names
-- `ref?: Ref` - React ref forwarded to the underlying element
-- All other HTML attributes of the specified element type are supported
-
 #### Type Definition
 ```typescript
-type ReactBoxProps<C extends ElementType> = Props<C>;
+interface PolymorphicProps<C extends ElementType> {
+  as?: C;
+  children?: React.ReactNode;
+}
 
-type ReactBoxComponent = (<C extends ElementType = 'div'>(
-  props: Props<C> & { ref?: React.Ref<React.ComponentRef<C>> }
-) => React.ReactElement) & {
-  displayName?: string;
-  withProps<D extends Record<string, unknown>>(
-    defaultProps: D
-  ): WithPropsReturnType<D>;
-};
+type Props<C extends ElementType> = PolymorphicProps<C> &
+  Omit<React.ComponentProps<C>, keyof PolymorphicProps<C>>;
+
+type ReactBoxComponent = <C extends ElementType = 'div'>(
+  props: Props<C> & { ref?: React.Ref<React.ElementRef<C>> }
+) => React.JSX.Element;
 ```
 
-### withProps
-Static method to create a new component with merged default props.
-
-```typescript
-const CustomComponent = ReactBox.withProps({
-  as: 'button',
-  className: 'px-4 py-2 bg-blue-500',
-  type: 'button'
-});
-```
+#### Props
+- `as?: ElementType` - The HTML element or React component to render (default: `'div'`)
+- `children?: React.ReactNode` - Child elements
+- `className?: string` - CSS class names (inherited from element props)
+- `ref?: Ref<React.ElementRef<C>>` - React ref forwarded to the underlying element
+- All other HTML attributes of the specified element type are supported
 
 ## TypeScript Support
 
 ReactBox is built with TypeScript from the ground up and provides excellent type inference:
 
 ```typescript
-import { ReactBox, type ReactBoxProps } from '@jswork/react-box';
+import { ReactBox, type Props } from '@jswork/react-box';
 
 // Type-safe props for button element
-type ButtonProps = ReactBoxProps<'button'> & {
+type ButtonProps = Props<'button'> & {
   variant?: 'primary' | 'secondary';
 };
 
-function Button({ variant = 'primary', ...props }: ButtonProps) {
+function Button({ variant = 'primary', className, ...props }: ButtonProps) {
   const variantClass = variant === 'primary'
     ? 'bg-blue-500 hover:bg-blue-600'
     : 'bg-gray-500 hover:bg-gray-600';
@@ -221,7 +179,7 @@ function Button({ variant = 'primary', ...props }: ButtonProps) {
   return (
     <ReactBox
       as="button"
-      className={`px-4 py-2 rounded ${variantClass}`}
+      className={`px-4 py-2 rounded ${variantClass} ${className || ''}`}
       {...props}
     />
   );
@@ -233,15 +191,9 @@ function Button({ variant = 'primary', ...props }: ButtonProps) {
 - **Default Element**: ReactBox renders as a `div` by default, but this can be changed with the `as` prop
 - **Type Safety**: When using the `as` prop, TypeScript will infer the correct props for that element
 - **Ref Forwarding**: Refs are automatically forwarded to the underlying element
-- **ClassName Merging**: Use your preferred className utility (clsx, cn, etc.) for merging classes
 - **Styling**: ReactBox is styling-agnostic and works with any CSS solution
-- **Component Variants**: Use `withProps` to create reusable component variants with default props
-- **Dependencies**: Ensure `classnames` peer dependency is installed in your project
-
-## Development
-- **Source**: [packages/lib/src](https://github.com/afeiship/react-box/tree/main/packages/lib/src)
-- **Built with**: TypeScript, React, tsup
-- **License**: MIT
+- **Props Merging**: All props are forwarded to the underlying element, including className, style, etc.
+- **Type Imports**: Use `type Props` to get the correctly typed props for a specific element type
 
 ## Examples
 
@@ -249,28 +201,15 @@ function Button({ variant = 'primary', ...props }: ButtonProps) {
 ```tsx
 import { ReactBox } from '@jswork/react-box';
 
-const Container = ReactBox.withProps({
-  className: 'container mx-auto px-4'
-});
-
-const Row = ReactBox.withProps({
-  className: 'flex flex-row gap-4'
-});
-
-const Col = ReactBox.withProps({
-  className: 'flex-1'
-});
-
-// Usage
 function Layout() {
   return (
-    <Container>
-      <Row>
-        <Col>Column 1</Col>
-        <Col>Column 2</Col>
-        <Col>Column 3</Col>
-      </Row>
-    </Container>
+    <ReactBox className="container mx-auto px-4">
+      <ReactBox className="flex flex-row gap-4">
+        <ReactBox className="flex-1">Column 1</ReactBox>
+        <ReactBox className="flex-1">Column 2</ReactBox>
+        <ReactBox className="flex-1">Column 3</ReactBox>
+      </ReactBox>
+    </ReactBox>
   );
 }
 ```
@@ -279,34 +218,49 @@ function Layout() {
 ```tsx
 import { ReactBox } from '@jswork/react-box';
 
-// Base components
-const Box = ReactBox;
-
-const Text = ReactBox.withProps({
-  as: 'p',
-  className: 'text-gray-700 leading-relaxed'
-});
-
-const Heading = ReactBox.withProps({
-  as: 'h2',
-  className: 'text-2xl font-bold text-gray-900 mb-4'
-});
-
-// Usage
 function Article() {
   return (
-    <Box className="article max-w-2xl mx-auto py-8">
-      <Heading>Article Title</Heading>
-      <Text>
+    <ReactBox className="article max-w-2xl mx-auto py-8">
+      <ReactBox as="h2" className="text-2xl font-bold text-gray-900 mb-4">
+        Article Title
+      </ReactBox>
+      <ReactBox as="p" className="text-gray-700 leading-relaxed">
         Article content goes here...
-      </Text>
-    </Box>
+      </ReactBox>
+    </ReactBox>
   );
 }
 ```
 
-## Related Packages
-- [@jswork/with-props](https://www.npmjs.com/package/@jswork/with-props): Utility for creating components with default props
+### Interactive Components
+```tsx
+import { ReactBox } from '@jswork/react-box';
+import { useState } from 'react';
+
+function Counter() {
+  const [count, setCount] = useState(0);
+
+  return (
+    <ReactBox className="flex gap-4 items-center">
+      <ReactBox as="button" onClick={() => setCount(c => c - 1)} className="px-4 py-2 bg-gray-200 rounded">
+        -
+      </ReactBox>
+      <ReactBox as="span" className="text-xl font-bold">
+        {count}
+      </ReactBox>
+      <ReactBox as="button" onClick={() => setCount(c => c + 1)} className="px-4 py-2 bg-blue-500 text-white rounded">
+        +
+      </ReactBox>
+    </ReactBox>
+  );
+}
+```
+
+## Development
+- **Source**: [packages/lib/src/index.tsx](https://github.com/afeiship/react-box/blob/main/packages/lib/src/index.tsx)
+- **Type Definitions**: [packages/lib/dist/main.d.ts](https://github.com/afeiship/react-box/blob/main/packages/lib/dist/main.d.ts)
+- **Built with**: TypeScript, React, tsup
+- **License**: MIT
 
 ## License
 Code released under [the MIT license](https://github.com/afeiship/react-box/blob/master/LICENSE.txt).
