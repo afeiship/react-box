@@ -11,7 +11,7 @@ function App() {
       <ReactBox as="a" target="_blank" href="https://js.work">JSW as anchor</ReactBox>
       <ReactBox as="img" alt="a" src="https://tva1.js.work/large/007S8ZIlgy1gexw87htqhj305k05k74o.jpg" />
       <Card description="xxx">Just a View</Card>
-      <ReactBox as={Card} description="xxx" footer="I am footer">
+      <ReactBox as={Card} description="xxx" footer="I am footer" title="card title">
         Test card
       </ReactBox>
       {/*<p>*/}

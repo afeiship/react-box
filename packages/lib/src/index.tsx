@@ -28,9 +28,9 @@ type ReactBoxComponent = <C extends ElementType = 'div'>(
  * A polymorphic box component that can render as any HTML element or React component.
  * @template C - The element type, defaults to 'div'
  */
-export const ReactBox = forwardRef<any, 'div'>(function ReactBox(
-  { as: AsComponent = 'div', children, ...rest }: any,
-  ref: any,
+export const ReactBox = forwardRef<React.ElementRef<any>, Props<any>>(function ReactBox(
+  { as: AsComponent = 'div', children, ...rest }: Props<any>,
+  ref: React.Ref<React.ElementRef<any>>,
 ) {
   return (
     <AsComponent ref={ref} {...rest}>
