@@ -28,7 +28,9 @@
   },
   "include": [
     "src",
-    "public"
+    "public",
+    "vitest.config.ts",
+    "__tests__"
   ],
   "exclude": [
     "node_modules",
